@@ -57,7 +57,7 @@ async function init(inReq, _outResp) {
     if (!device.id) {
         device = randDeviceWithId(33);
         device.id = device.id.toLowerCase();
-        device.ua = 'okhttp/4.1.0';
+        device.ua = 'okhttp/3.14.9';
         await inReq.server.db.push(deviceKey, device);
     }
     return {};
