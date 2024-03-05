@@ -3,14 +3,7 @@ export default {
         testcfg: {
             bbbb: 'aaaaa',
         },
-    },
-    ali: {
-    token: 'da946a0f14c844ab813c83f072f56035',
-    token280: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyMjVjNDgzNDBmMGY0YmU5YmI3YzE5YTY4NjhkZjI3MCIsImF1ZCI6IjczZTYxMTgzMWE3YzRkODdhYzQ5Yzg0ODFiZjlmMmM0IiwiZXhwIjoxNzE3NDAwNDE2LCJpYXQiOjE3MDk2MjQ0MTYsImp0aSI6IjJhNDA5YWNlNGQ5NjRmN2U4Y2Q5NTU3NjIzZDlhYmFkIn0.wUIDL3mXoaYvYQvFNGv9yTJzmudJLt5kOhmW3TwKEGaEAgnRktbHejUoFb99a1XM5ho7jyp9rQWxHO_0kI0L3Q',
-},
-wogg: {
-    url: 'https://wogg.xyz',
-},
+    },    
     ffm3u8: {
         url: 'https://cj.ffzyapi.com/api.php/provide/vod/from/ffm3u8/',
         categories: ['国产剧', '香港剧', '韩国剧', '欧美剧', '台湾剧', '日本剧', '海外剧', '泰国剧', '短剧', '动作片', '喜剧片', '爱情片', '科幻片', '恐怖片', '剧情片', '战争片', '动漫片', '大陆综艺', '港台综艺', '日韩综艺', '欧美综艺', '国产动漫', '日韩动漫', '欧美动漫', '港台动漫', '海外动漫', '记录片'],
