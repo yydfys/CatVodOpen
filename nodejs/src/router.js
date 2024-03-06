@@ -7,12 +7,13 @@ import kkys from './spider/video/kkys.js';
 import push from './spider/video/push.js';
 import alist from './spider/pan/alist.js';
 import _13bqg from './spider/book/13bqg.js';
+import laobaigs from './spider/book/laobaigs.js';
 import copymanga from './spider/book/copymanga.js';
 import ffm3u8 from './spider/video/ffm3u8.js';
 import hhm3u8 from './spider/video/hhm3u8.js';
 import lzm3u8 from './spider/video/lzm3u8.js';
 
-const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, ffm3u8, hhm3u8, lzm3u8, push, alist, _13bqg, copymanga];
+const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, ffm3u8, hhm3u8, lzm3u8, push, alist, _13bqg, laobaigs, copymanga];
 const spiderPrefix = '/spider';
 
 /**
