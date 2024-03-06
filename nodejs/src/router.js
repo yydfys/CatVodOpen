@@ -10,8 +10,9 @@ import _13bqg from './spider/book/13bqg.js';
 import copymanga from './spider/book/copymanga.js';
 import ffm3u8 from './spider/video/ffm3u8.js';
 import hhm3u8 from './spider/video/hhm3u8.js';
+import lzm3u8 from './spider/video/lzm3u8.js';
 
-const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, ffm3u8, hhm3u8, push, alist, _13bqg, copymanga];
+const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, ffm3u8, hhm3u8, lzm3u8, push, alist, _13bqg, copymanga];
 const spiderPrefix = '/spider';
 
 /**
@@ -20,79 +21,84 @@ const spiderPrefix = '/spider';
  * @param {Object} fastify - The Fastify instance
  * @return {Promise<void>} - A Promise that resolves when the router is initialized
  */
-export default async function router(fastify) {
+export
+default async
+function router(fastify) {
     // register all spider router
     spiders.forEach((spider) => {
         const path = spiderPrefix + '/' + spider.meta.key + '/' + spider.meta.type;
-        fastify.register(spider.api, { prefix: path });
+        fastify.register(spider.api, {
+            prefix: path
+        });
         console.log('Register spider: ' + path);
     });
     /**
      * @api {get} /check 检查
      */
     fastify.register(
+    /**
+     *
+     * @param {import('fastify').FastifyInstance} fastify
+     */
+    async(fastify) => {
+        fastify.get(
+            '/check',
         /**
-         *
-         * @param {import('fastify').FastifyInstance} fastify
+         * check api alive or not
+         * @param {import('fastify').FastifyRequest} _request
+         * @param {import('fastify').FastifyReply} reply
          */
-        async (fastify) => {
-            fastify.get(
-                '/check',
-                /**
-                 * check api alive or not
-                 * @param {import('fastify').FastifyRequest} _request
-                 * @param {import('fastify').FastifyReply} reply
-                 */
-                async function (_request, reply) {
-                    reply.send({ run: !fastify.stop });
+        async
+        function(_request, reply) {
+            reply.send({
+                run: !fastify.stop
+            });
+        });
+        fastify.get(
+            '/config',
+        /**
+         * get catopen format config
+         * @param {import('fastify').FastifyRequest} _request
+         * @param {import('fastify').FastifyReply} reply
+         */
+        async
+        function(_request, reply) {
+            const config = {
+                video: {
+                    sites: [],
+                },
+                read: {
+                    sites: [],
+                },
+                comic: {
+                    sites: [],
+                },
+                music: {
+                    sites: [],
+                },
+                pan: {
+                    sites: [],
+                },
+                color: fastify.config.color || [],
+            };
+            spiders.forEach((spider) => {
+                let meta = Object.assign({}, spider.meta);
+                meta.api = spiderPrefix + '/' + meta.key + '/' + meta.type;
+                meta.key = 'nodejs_' + meta.key;
+                const stype = spider.meta.type;
+                if (stype < 10) {
+                    config.video.sites.push(meta);
+                } else if (stype >= 10 && stype < 20) {
+                    config.read.sites.push(meta);
+                } else if (stype >= 20 && stype < 30) {
+                    config.comic.sites.push(meta);
+                } else if (stype >= 30 && stype < 40) {
+                    config.music.sites.push(meta);
+                } else if (stype >= 40 && stype < 50) {
+                    config.pan.sites.push(meta);
                 }
-            );
-            fastify.get(
-                '/config',
-                /**
-                 * get catopen format config
-                 * @param {import('fastify').FastifyRequest} _request
-                 * @param {import('fastify').FastifyReply} reply
-                 */
-                async function (_request, reply) {
-                    const config = {
-                        video: {
-                            sites: [],
-                        },
-                        read: {
-                            sites: [],
-                        },
-                        comic: {
-                            sites: [],
-                        },
-                        music: {
-                            sites: [],
-                        },
-                        pan: {
-                            sites: [],
-                        },
-                        color: fastify.config.color || [],
-                    };
-                    spiders.forEach((spider) => {
-                        let meta = Object.assign({}, spider.meta);
-                        meta.api = spiderPrefix + '/' + meta.key + '/' + meta.type;
-                        meta.key = 'nodejs_' + meta.key;
-                        const stype = spider.meta.type;
-                        if (stype < 10) {
-                            config.video.sites.push(meta);
-                        } else if (stype >= 10 && stype < 20) {
-                            config.read.sites.push(meta);
-                        } else if (stype >= 20 && stype < 30) {
-                            config.comic.sites.push(meta);
-                        } else if (stype >= 30 && stype < 40) {
-                            config.music.sites.push(meta);
-                        } else if (stype >= 40 && stype < 50) {
-                            config.pan.sites.push(meta);
-                        }
-                    });
-                    reply.send(config);
-                }
-            );
-        }
-    );
+            });
+            reply.send(config);
+        });
+    });
 }
