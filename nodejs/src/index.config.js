@@ -5,10 +5,6 @@ default {
             bbbb: 'aaaaa',
         },
     },
-    ali: {
-        token280: '',
-        token: "",
-    },
     wogg: {
         url: 'https://wogg.xyz',
     },
