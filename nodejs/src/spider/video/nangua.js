@@ -41,7 +41,7 @@ async function home(_inReq, _outResp) {
 async function category(inReq, _outResp) {
 
     const tid = inReq.body.id;
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const extend = inReq.body.filters;
 
 	if(pg <= 0) pg = 1;
