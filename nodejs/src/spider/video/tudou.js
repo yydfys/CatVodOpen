@@ -152,7 +152,7 @@ async function detail(inReq, _outResp) {
             } else if (idx === 5) {
                 const c = {name: name };
                 actor.push(`${name}`);
-            } else if (idx === 1) {
+            } else if (idx === 4) {
                 year = name;
             }
         });
@@ -160,7 +160,7 @@ async function detail(inReq, _outResp) {
             vod_year: year,
             vod_actor: actor.join(', '),
             vod_director: director.join(', '),
-            vod_content: $('div.video-info-content').text().trim(),
+            vod_content:$('p.sqjj_a').text().trim().replace('[收起部分]', ''),
         };
 
         const shareUrls = $('div.module-row-info p')
@@ -393,7 +393,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'tudou',
-        name: '土豆资源',
+        name: '🍀土豆资源',
         type: 3,
     },
     api: async (fastify) => {

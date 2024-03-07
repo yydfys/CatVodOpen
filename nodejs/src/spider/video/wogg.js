@@ -186,7 +186,7 @@ async function detail(inReq, _outResp) {
             vod_year: year,
             vod_actor: actor.join(', '),
             vod_director: director.join(', '),
-            vod_content: $('div.video-info-content').text().trim(),
+            vod_content: $('p.sqjj_a').text().trim().replace('[收起部分]', ''),
         };
 
         const shareUrls = $('div.module-row-info p')
@@ -419,7 +419,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'wogg',
-        name: '玩偶哥哥',
+        name: '🍀玩偶哥哥',
         type: 3,
     },
     api: async (fastify) => {
