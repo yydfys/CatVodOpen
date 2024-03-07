@@ -20,7 +20,7 @@ import snm3u8 from './spider/video/snm3u8.js';
 import wjm3u8 from './spider/video/wjm3u8.js';
 import maiyoux from './spider/video/maiyoux.js';
 
-const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, nangua, ffm3u8, hhm3u8, lzm3u8, subm3u8, hnm3u8, xlm3u8, snm3u8, maiyoux, push, alist, _13bqg, laobaigs, copymanga];
+const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, nangua, ffm3u8, hhm3u8, lzm3u8, subm3u8, hnm3u8, xlm3u8, snm3u8, wjm3u8, maiyoux, push, alist, _13bqg, laobaigs, copymanga];
 const spiderPrefix = '/spider';
 
 /**
