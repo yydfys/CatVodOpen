@@ -300,7 +300,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'alist',
-        name: 'Alist',
+        name: '🍀 Alist网盘',
         type: 40,
     },
     api: async (fastify) => {
