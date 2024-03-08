@@ -187,7 +187,7 @@ async function login() {
                     refresh_token: config.token,
                     grant_type: 'refresh_token',
                 },
-                { headers: baseHeaders }
+                { headers: baseHeaders },
             )
             .catch((err) => {
                 return err.response || { status: 500, data: {} };
@@ -213,7 +213,7 @@ async function openAuth() {
                 },
                 {
                     headers: baseHeaders,
-                }
+                },
             )
             .catch((err) => {
                 return err.response || { status: 500, data: {} };
@@ -328,18 +328,11 @@ export async function getFilesByShareUrl(shareInfo) {
             },
             {
                 'X-Share-Token': shareTokenCache[shareId].share_token,
-            }
+            },
         );
 
         const items = listData.items;
         if (!items) return [];
-
-        if (listData.next_marker) {
-            const nextItems = await listFile(shareId, folderId, listData.next_marker);
-            for (const item of nextItems) {
-                items.push(item);
-            }
-        }
 
         const subDir = [];
 
@@ -352,6 +345,13 @@ export async function getFilesByShareUrl(shareInfo) {
                 videos.push(item);
             } else if (item.type === 'file' && subtitleExts.some((x) => item.file_extension.endsWith(x))) {
                 subtitles.push(item);
+            }
+        }
+
+        if (listData.next_marker) {
+            const nextItems = await listFile(shareId, folderId, listData.next_marker);
+            for (const item of nextItems) {
+                items.push(item);
             }
         }
 
@@ -406,7 +406,7 @@ async function save(shareId, fileId, clean) {
         },
         {
             'X-Share-Token': shareTokenCache[shareId].share_token,
-        }
+        },
     );
     if (saveResult.file_id) return saveResult.file_id;
     return false;
@@ -430,9 +430,9 @@ export async function getLiveTranscoding(shareId, fileId) {
     return null;
 }
 
-export async function getDownload(shareId, fileId) {
+export async function getDownload(shareId, fileId, clean) {
     if (!saveFileIdCaches[fileId]) {
-        const saveFileId = await save(shareId, fileId, true);
+        const saveFileId = await save(shareId, fileId, clean);
         if (!saveFileId) return null;
         saveFileIdCaches[fileId] = saveFileId;
     }
