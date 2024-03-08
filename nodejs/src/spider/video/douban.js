@@ -432,7 +432,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'douban',
-        name: '🍀豆瓣电影',
+        name: '🍀 豆瓣电影',
         type: 3,
         indexs: 1,
     },
