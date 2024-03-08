@@ -12,8 +12,8 @@ async function request(reqUrl) {
 }
 
 async function init(inReq, _outResp) {
-    url = inReq.server.config.lzm3u8.url;
-    categories = inReq.server.config.lzm3u8.categories;
+    url = inReq.server.config.kuaikan.url;
+    categories = inReq.server.config.kuaikan.categories;
     return {};
 }
 
@@ -237,8 +237,8 @@ async function test(inReq, outResp) {
 
 export default {
     meta: {
-        key: 'lzm3u8',
-        name: '🍀 量子采集',
+        key: 'kuaikan',
+        name: '🍀 快看采集',
         type: 3,
     },
     api: async (fastify) => {
