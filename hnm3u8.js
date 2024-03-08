@@ -238,7 +238,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'hnm3u8',
-        name: '🍀红牛采集',
+        name: '🍀 红牛采集',
         type: 3,
     },
     api: async (fastify) => {
