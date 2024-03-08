@@ -200,7 +200,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'goga',
-        name: 'G站漫画',
+        name: '🍀 G站漫画',
         type: 20,
     },
     api: async (fastify) => {
