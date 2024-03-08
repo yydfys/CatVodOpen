@@ -393,7 +393,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'tudou',
-        name: '🍀土豆资源',
+        name: '🍀 土豆资源',
         type: 3,
     },
     api: async (fastify) => {

@@ -71,7 +71,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'push',
-        name: '🍀推送',
+        name: '🍀 推送',
         type: 4,
     },
     api: async (fastify) => {
