@@ -1,5 +1,6 @@
 import douban from './spider/video/douban.js';
 import wogg from './spider/video/wogg.js';
+import ysche from './spider/video/ysche.js';
 import wobg from './spider/video/wobg.js';
 import tudou from './spider/video/tudou.js';
 import kunyu77 from './spider/video/kunyu77.js';
@@ -23,7 +24,7 @@ import kuaikan from './spider/video/kuaikan.js';
 import wjm3u8 from './spider/video/wjm3u8.js';
 import maiyoux from './spider/video/maiyoux.js';
 
-const spiders = [douban, wogg, wobg, tudou, kunyu77, kkys, nangua, ffm3u8, hhm3u8, lzm3u8, subm3u8, hnm3u8, xlm3u8, kuaikan, wjm3u8, maiyoux, push, alist, _13bqg, laobaigs, baozimh, copymanga];
+const spiders = [douban, wogg, ysche, wobg, tudou, kunyu77, kkys, nangua, ffm3u8, hhm3u8, lzm3u8, subm3u8, hnm3u8, xlm3u8, kuaikan, wjm3u8, maiyoux, push, alist, _13bqg, laobaigs, baozimh, copymanga];
 const spiderPrefix = '/spider';
 
 /**
