@@ -1,26 +1,34 @@
 // 无搜索功能
+import { _ } from '../../util/cat.js';
+
 import req from '../../util/req.js';
-import pkg from 'lodash';
-const { _ } = pkg;
-import { MOBILE_UA } from '../../util/misc.js';
+import CryptoJS from 'crypto-js';
 
-let HOST = 'http://api.cntv.cn';
 let key = '视聚场';
+let HOST = 'http://api.cntv.cn';
+let siteKey = '';
+let siteType = 0;
+const MOBILE_UA = 'Mozilla/5.0 (Linux; Android 11; M2007J3SC Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045714 Mobile Safari/537.36';
 
-async function request(reqUrl) {
-    let resp = await req.get(reqUrl, {
+async function request(reqUrl, agentSp) {
+    let res = await req(reqUrl, {
+        method: 'get',
         headers: {
-            'User-Agent': MOBILE_UA ,
+            'User-Agent': agentSp || MOBILE_UA,
         },
     });
-    return resp.data;
+
+    console.debug(res.data);
+    return res.data
 }
 
-async function init(_inReq, _outResp) {
-    return{};
+async function init(inReq, _outResp) {
+    // siteKey = cfg.skey;
+    // siteType = cfg.stype
+    return {}
 }
 
-async function home(filter) {
+async function home(inReq, _outResp) {
     const classes = [ 
         { type_id: "TOPC1451559025546574", type_name: "动画大放映" }, 
         { type_id: "TOPC1451378857272262", type_name: "第一动画乐园" }, 
@@ -85,7 +93,7 @@ async function home(filter) {
         { type_id: "TOPC1451543462858283", type_name: "一线" }
         ];
     const filterObj = {};
-    return ({
+    return JSON.stringify({
         class: _.map(classes, (cls) => {
             cls.land = 1;
             cls.ratio = 1.78;
@@ -94,13 +102,33 @@ async function home(filter) {
         filters: filterObj,
     })
 }
-// tid, pg, filter, extend
+
 async function category(inReq, _outResp) {
-    const tid= inReq.body.id;
-    const pg = inReq.body.page;
-    let page = pg || 1;
-    if (page <= 0 || typeof page == 'undefined') page = 1;
+    // if (pg <= 0 || typeof pg == 'undefined') pg = 1;
+
+    const tid = inReq.body.id;
+    let pg = inReq.body.page;
+    const extend = inReq.body.filters;
+
+	if(pg <= 0) pg = 1;
+
     const data = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + pg + '&mode=0&serviceId=tvcctv'));
+
+    console.debug(data);
+
+    // 换普通处理方法
+    let  videos = [];
+    for (const vod of data.data.list) {
+        let a =  {
+        vod_id: vod.guid,
+        vod_name: vod.title,
+        vod_pic: vod.image,
+        // vod_remarks: vod.msg,
+        }
+        videos.push(a);
+     }
+
+     /*
     let videos = _.map(data.data.list, (it) => {
         return {
             vod_id: it.guid,
@@ -108,11 +136,11 @@ async function category(inReq, _outResp) {
             vod_pic: it.image,
             vod_remarks: it.time || '',
         }
-    });
-    const pgChk = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + (parseInt(page) + 1) + '&mode=0&serviceId=tvcctv')).data.list;
-    const pgCount = pgChk.length > 0 ? parseInt(page) + 1 : parseInt(page);
+    });*/
+    const pgChk = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + (parseInt(pg) + 1) + '&mode=0&serviceId=tvcctv')).data.list;
+    const pgCount = pgChk.length > 0 ? parseInt(pg) + 1 : parseInt(pg);
     return JSON.stringify({
-        page: parseInt(page),
+        page: parseInt(pg),
         pagecount: parseInt(pgCount),
         limit: 10,
         total: parseInt(data.total),
@@ -120,30 +148,34 @@ async function category(inReq, _outResp) {
     })
 }
 
-// id
 async function detail(inReq, _outResp) {
-    const id= inReq.body.id;
-    const vod = {
-        vod_id: id,
-        vod_remarks: '',
-    };
-    const playlist = ['点击播放' + '$' + 'https://hls.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/' + id + '/2000.m3u8'];
-    vod.vod_play_from = key;
-    vod.vod_play_url = playlist.join('#');
-    return({
-        list: [vod],
-    });
+    const ids = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
+    const videos = [];
+
+    for (const id of ids) {
+        const vod = {
+            vod_id: id,
+            vod_remarks: '',
+        };
+        const playlist = ['点击播放' + '$' + 'https://hls.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/' + id + '/2000.m3u8'];
+        vod.vod_play_from = key;
+        vod.vod_play_url = playlist.join('#');
+        return JSON.stringify({
+            list: [vod],
+        });
+    }
 }
 
-async function play(_inReq, _outResp) {
+async function play(inReq, _outResp) {
     // console.debug('视聚场 id =====>' + id); // js_debug.log
-    return({
+    const id = inReq.body.id;
+    return JSON.stringify({
         parse: 0,
         url: id,
     })
 }
 
-async function search(inReq, outResp) {
+async function search(wd, quick, pg) {
     return '{}'
 }
 
@@ -161,7 +193,7 @@ async function test(inReq, outResp) {
         printErr(resp.json());
         resp = await inReq.server.inject().post(`${prefix}/home`);
         dataResult.home = resp.json();
-        printErr(resp.json());
+        printErr("" + resp.json());
         if (dataResult.home.class.length > 0) {
             resp = await inReq.server.inject().post(`${prefix}/category`).payload({
                 id: dataResult.home.class[0].type_id,
@@ -173,15 +205,15 @@ async function test(inReq, outResp) {
             printErr(resp.json());
             if (dataResult.category.list.length > 0) {
                 resp = await inReq.server.inject().post(`${prefix}/detail`).payload({
-                    id: dataResult.category.list[0].book_id, // dataResult.category.list.map((v) => v.vod_id),
+                    id: dataResult.category.list[0].vod_id, // dataResult.category.list.map((v) => v.vod_id),
                 });
                 dataResult.detail = resp.json();
                 printErr(resp.json());
                 if (dataResult.detail.list && dataResult.detail.list.length > 0) {
                     dataResult.play = [];
-                    for (const book of dataResult.detail.list) {
-                        const flags = book.volumes.split('$$$');
-                        const ids = book.urls.split('$$$');
+                    for (const vod of dataResult.detail.list) {
+                        const flags = vod.vod_play_from.split('$$$');
+                        const ids = vod.vod_play_url.split('$$$');
                         for (let j = 0; j < flags.length; j++) {
                             const flag = flags[j];
                             const urls = ids[j].split('#');
@@ -201,7 +233,7 @@ async function test(inReq, outResp) {
             }
         }
         resp = await inReq.server.inject().post(`${prefix}/search`).payload({
-            wd: '入手',
+            wd: '暴走',
             page: 1,
         });
         dataResult.search = resp.json();
@@ -217,7 +249,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'cntv',
-        name: '🍀 央视频道',
+        name: '🍀 中央影视',
         type: 3,
     },
     api: async (fastify) => {
