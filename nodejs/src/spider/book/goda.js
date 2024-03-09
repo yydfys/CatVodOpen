@@ -39,7 +39,7 @@ async function category(inReq, _outResp) {
     const pg =inReq.body.page;
     let page = pg || 1;
     if (page == 0) page = 1;
-    var html = await request(url + `/${tid}/page/${pg}`);
+    var html = await request(url + `/${tid}/page/${page}`);
     const $ = load(html);
     let books = [];
     for (const pb of $('div.pb-2')) {
@@ -53,8 +53,8 @@ async function category(inReq, _outResp) {
         });
     }
     return {
-        page: pg,
-        pagecount: $('a:contains(下一页)').length === 0 ? pg + 1 : pg,
+        page: page,
+        pagecount: $('a:contains(下一页)').length === 0 ? page + 1: page ,
         list: books,
     };
 }
@@ -64,7 +64,7 @@ async function detail(inReq, _outResp) {
     const books = [];
     for (const id of ids) {
     var info = id.split('/');
-        var html = await request(url+`/${id}`);
+        var html = await request(url+`${id}`);
         let $ = load(html);
         let book = {
             book_name: $('h1').text().trim(),
@@ -116,25 +116,24 @@ async function play(inReq, _outResp) {
     };
 }
 
-
 async function search(inReq, _outResp) {
     const wd = inReq.body.wd;
-    const html = await req.get(`${url}/s/${encodeURIComponent(wd)}`);
+    const pg =inReq.body.page;
+    let page = pg || 1;
+    if (page == 0) page = 1;
+    const html = await request(`${url}/s/${wd}?page=${page}`);
     const $ = load(html);
     let books = [];
-    for (const pb of $('div.pb-2')) {
-        const a = $(pb).find('a:first')[0];
-        const img = $(a).find('img:first')[0];
-        const h3 = $(pb).find('h3:first')[0];
+    for (const pb of $('.pb-2')) {
         books.push({
-            book_id: a.attribs.href,
-            book_name: h3.children[0].data.trim(),
-            book_pic: img.attribs.src,
+            book_id: $(pb).find('a:first')[0].attribs.href,
+            book_name: $(pb).text().trim(),
+            book_pic: $(pb).find('img:first')[0].attribs.src,
         });
-        console.log(books)
     }
     return {
-        tline: 2,
+        page: page,
+        pagecount: $('a:contains(下一页)').length ==0 ? page + 1: page,
         list: books,
     };
 }
@@ -209,7 +208,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'goda',
-        name: '🍀 GODA漫画',
+        name: '🍀 G站漫画',
         type: 20,
     },
     api: async (fastify) => {
