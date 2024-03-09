@@ -21,7 +21,6 @@ import copymanga from './spider/book/copymanga.js';
 import ffm3u8 from './spider/video/ffm3u8.js';
 import hhm3u8 from './spider/video/hhm3u8.js';
 import lzm3u8 from './spider/video/lzm3u8.js';
-import snm3u8 from './spider/video/snm3u8.js';
 import subm3u8 from './spider/video/subm3u8.js';
 import hnm3u8 from './spider/video/hnm3u8.js';
 import xlm3u8 from './spider/video/xlm3u8.js';
@@ -29,7 +28,7 @@ import kuaikan from './spider/video/kuaikan.js';
 import wjm3u8 from './spider/video/wjm3u8.js';
 import maiyoux from './spider/video/maiyoux.js';
 
-const spiders = [douban, wogg, ysche, wobg, tudou, kunyu77, kkys, nangua, wenku, bg, ffm3u8, hhm3u8, lzm3u8, snm3u8, subm3u8, hnm3u8, xlm3u8, kuaikan, wjm3u8, maiyoux, push, alist, _13bqg, goda, laobaigs, baozimh, copymanga];
+const spiders = [douban, wogg, ysche, wobg, tudou, baipiaoys, kunyu77, kkys, nangua, wenku, bg, ffm3u8, hhm3u8, lzm3u8, subm3u8, hnm3u8, xlm3u8, kuaikan, wjm3u8, maiyoux, push, alist, _13bqg, goda, laobaigs, baozimh, copymanga];
 const spiderPrefix = '/spider';
 
 /**
