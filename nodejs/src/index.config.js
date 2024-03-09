@@ -12,8 +12,8 @@ default {
     quark: {
         cookie: 'xxxx'
     },
-    weixine: {
-        url: 'https://wogg.xyz',
+    ysche: {
+        url: 'https://www.weixine.link/',
     },
     wogg: {
         url: 'https://wogg.xyz',
@@ -36,6 +36,10 @@ default {
     lzm3u8: {
         url: 'https://cj.lziapi.com/api.php/provide/vod/from/lzm3u8/',
         categories: ['动作片', '爱情片', '喜剧片', '科幻片', '恐怖片', '剧情片', '战争片', '短剧', '国产剧', '欧美剧', '香港剧', '韩国剧', '日本剧', '台湾剧', '海外剧', '泰国剧', '国产动漫', '日韩动漫', '欧美动漫', '港台动漫', '海外动漫', '大陆综艺', '港台综艺', '日韩综艺', '欧美综艺', '记录片', '足球', '篮球', '网球', '斯诺克'],
+    },
+    snm3u8: {
+        url: 'https://suoniapi.com/api.php/provide/vod/from/snm3u8/',
+        categories: ['4k电影', '动作片', '爱情片', '喜剧片', '科幻片', '恐怖片', '剧情片', '战争片', '动画片', '爽文短剧', '国产剧', '欧美剧', '港剧', '韩剧', '日剧', '台剧', '海外剧', '泰剧', '国产动漫', '日韩动漫', '欧美动漫', '港台动漫', '海外动漫', '大陆综艺', '港台综艺', '日韩综艺', '欧美综艺', '演唱会', '纪录片', '足球', '篮球', '影视解说', '预告片'],
     },
     subm3u8: {
         url: 'https://subocaiji.com/api.php/provide/vod/from/subm3u8/',
