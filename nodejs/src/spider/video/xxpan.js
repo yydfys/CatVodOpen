@@ -47,7 +47,7 @@ async function home(_inReq, _outResp) {
 }
 
 async function category(inReq, _outResp) {
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     if (pg <= 0) pg = 1;
     let page = '';
     if (pg > 1) {
@@ -323,7 +323,7 @@ async function play(inReq, _outResp) {
 }
 
 async function search(inReq, _outResp) {
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const wd = inReq.body.wd;
     if (pg <= 0) pg = 1;
     let page = '';
