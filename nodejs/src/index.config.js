@@ -18,7 +18,9 @@ default {
     wogg: {
         url: 'https://wogg.xyz',
     },
-
+    xiaoya: {
+        url: 'http://192.168.0.222:4567/vod1/'
+    },
     tudou: {
         url: 'https://aliz.lvdoui.top',
     },
