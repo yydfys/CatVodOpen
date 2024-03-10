@@ -15,6 +15,9 @@ default {
     ysche: {
         url: 'https://www.weixine.link/',
     },
+    xxpan: {
+        url: 'https://xpanpan.site',
+    },
     wogg: {
         url: 'https://wogg.xyz',
     },
