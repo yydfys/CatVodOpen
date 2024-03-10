@@ -37,7 +37,7 @@ async function init(inReq, _outResp) {
     return {};
 }
 
-async function home(_inReq, _outResp) {
+async function home(inReq, _outResp) {
     const classes = [{'type_id':'all','type_name':'all'}];
     const filterObj = {};
     return {
@@ -87,7 +87,7 @@ async function detail(inReq, _outResp) {
     const ids = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
     const videos = [];
     for (const id of ids) {
-        const html = await request(siteUrl +  id  + '.html');
+        const html = await request(id);
         const $ = load(html);
         let vod = {
             vod_id: id,
