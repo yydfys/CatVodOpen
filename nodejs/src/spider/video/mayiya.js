@@ -6,7 +6,7 @@ import { load } from 'cheerio';
 import pkg from 'lodash';
 const { _ } = pkg;
 
-let key = 'mayiya';
+//let key = 'mayiya';
 let HOST = 'https://www.huanyuxing.com';
 let siteKey = '';
 let siteType = 0;
