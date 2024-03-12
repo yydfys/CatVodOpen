@@ -8,7 +8,7 @@ import { load } from 'cheerio';
 import pkg from 'lodash';
 const { _ } = pkg;
 
-//let key = 'czzy';
+let key = 'czzy';
 let host = 'https://cz01.vip/'; // 厂长地址发布页
 let url = 'https://www.czzy77.com/';
 let siteKey = '';
@@ -124,7 +124,7 @@ async function home(inReq, outResp) {
 async function category(inReq, _outResp) {
     // tid, pg, filter, extend
     const tid = inReq.body.id;
-    let pg = inReq.body.page;
+    const pg = inReq.body.page;
     const extend = inReq.body.filters;
 
 	if(pg <= 0) pg = 1;
