@@ -21,6 +21,9 @@ default {
     wogg: {
         url: 'https://wogg.xyz',
     },
+    wwgg: {
+        url: 'http://www.kxys.site:66/',
+    },
     xiaoya: {
         url: 'http://192.168.0.222:4567/vod1/'
     },
