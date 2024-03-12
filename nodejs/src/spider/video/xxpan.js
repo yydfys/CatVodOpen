@@ -6,32 +6,28 @@ import * as Ali from '../../util/ali.js';
 import * as Quark from '../../util/quark.js';
 import dayjs from 'dayjs';
 
-let siteUrl = '';
-
+let url = 'https://xpanpan.site';
 
 async function request(reqUrl) {
     const resp = await req.get(reqUrl, {
         headers: {
-            'User-Agent': siteUrl,
+            'User-Agent': MAC_UA,
         },
     });
-    let content = resp.data;
-    return content;
+    return resp.data;
 }
 
-// ali token 相关配置放在 index.config.js
+// 配置放在 index.config.js
 /*
 ali: {
     token: 'xxxxxxxxxxxxxxxxxxxxxxxxx',
     token280: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 },
-wogg: {
-    url: 'https://wogg.xyz',
+quark: {
+    cookie: 'xxxx'
 },
 */
-
 async function init(inReq, _outResp) {
-    siteUrl = inReq.server.config.xxpan.url;
     await Ali.initAli(inReq.server.db, inReq.server.config.ali);
     await Quark.initQuark(inReq.server.db, inReq.server.config.quark);
     return {};
@@ -53,7 +49,7 @@ async function category(inReq, _outResp) {
     if (pg > 1) {
         page = '/page/' + pg;
     }
-    const html = await request(siteUrl + page + '/');
+    const html = await request(url + page + '/');
     return parseHtmlList(html, pg);
 }
 
@@ -94,10 +90,9 @@ async function detail(inReq, _outResp) {
             vod_name: $($('.entry-content h6')).text(),
             vod_pic: 'https://pic.rmb.bdstatic.com/bjh/6a2278365c10139b5b03229c2ecfeea4.jpeg',
         };
-
         const shareUrls = $('div.entry-content ul li a')
-        .map((_, a) => a.children[0].data)
-        .get();
+            .map((_, a) => a.children[0].data)
+            .get();
         const froms = [];
         const urls = [];
         for (const shareUrl of shareUrls) {
@@ -141,7 +136,6 @@ async function detail(inReq, _outResp) {
         list: videos,
     };
 }
-
 
 const aliTranscodingCache = {};
 const aliDownloadingCache = {};
@@ -330,10 +324,9 @@ async function search(inReq, _outResp) {
     if (pg > 1) {
         page = '/page/' + pg;
     }
-    const html = await request(siteUrl + page + "/?s=" + encodeURIComponent(wd));
+    const html = await request(url + page + "/?s=" + encodeURIComponent(wd));
     return parseHtmlList(html, pg);
 }
-
 
 async function test(inReq, outResp) {
     try {
@@ -415,7 +408,7 @@ export default {
         fastify.post('/detail', detail);
         fastify.post('/play', play);
         fastify.post('/search', search);
-        fastify.get('/proxy/:what/:flag/:shareId/:fileId/:end', proxy);
+        fastify.get('/proxy/:site/:what/:flag/:shareId/:fileId/:end', proxy);
         fastify.get('/test', test);
     },
 };
