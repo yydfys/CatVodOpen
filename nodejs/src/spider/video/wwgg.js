@@ -22,7 +22,7 @@ wwgg: {
 },
 */
 async function init(inReq, _outResp) {
-    url = inReq.server.config.ttkx.url;
+    url = inReq.server.config.wwgg.url;
     await initAli(inReq.server.db, inReq.server.config.ali);
     return {};
 }
