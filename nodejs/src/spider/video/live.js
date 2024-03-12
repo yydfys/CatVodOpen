@@ -122,7 +122,7 @@ async function homeVod() {
 
 async function category(inReq, _outResp) {
     const tid = inReq.body.id;
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     if (_.isEmpty(channels[tid])) return '{}';
     let videos = [];
     for (let channelName in channels[tid]) {
