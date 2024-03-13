@@ -63,6 +63,13 @@ var index_config_default = {
     wobg: {
         url: "https://wobge.run.goorm.io"
     },
+    yiso: {
+        url: 'https://yiso.fun',
+        cookie: '填入yiso的cookie即可',
+    },
+    ikanbot: {
+        url: "https://www.aikanbot.com"
+    },
     live: {
         url: "https://mirror.ghproxy.com/raw.githubusercontent.com/dxawi/0/main/tvlive.txt"
     },
