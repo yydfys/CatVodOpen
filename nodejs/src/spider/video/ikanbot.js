@@ -86,7 +86,7 @@ async function category(inReq, _outResp) {
     // tid, pg, filter, extend
     // if (pg <= 0) pg = 1;
     let tid = inReq.body.id;
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     let extend = inReq.body.filters;
 
 	if(pg <= 0) pg = 1;
