@@ -29,7 +29,7 @@ async function request(reqUrl, agentSp) {
 async function init(inReq, _outResp) {
     // siteKey = cfg.skey;
     // siteType = cfg.stype;
-    url = inReq.server.config.ikanbot.url;
+    url = 'https://www.aikanbot.com';
     return {};
 }
 
