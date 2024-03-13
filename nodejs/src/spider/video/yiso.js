@@ -196,7 +196,7 @@ async function play(inReq, _outResp) {
 }
 
 async function search(inReq, _outResp) {
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const wd = inReq.body.wd;
     if (pg <= 0) pg = 1;
     const limit = 10;
