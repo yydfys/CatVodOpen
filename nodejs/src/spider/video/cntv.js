@@ -1,4 +1,4 @@
-// 无搜索功能
+    // 无搜索功能
 import pkg from 'lodash';
 const { _ } = pkg;
 import { MOBILE_UA } from '../../util/misc.js';
@@ -6,7 +6,7 @@ import req from '../../util/req.js';
 import CryptoJS from 'crypto-js';
 
 let key = 'cntv';
-let HOST = 'http://api.cntv.cn';
+let HOST = 'http://tv.cctv.com';
 
 async function request(reqUrl) {
  let resp = await req.get(reqUrl, {
@@ -26,7 +26,7 @@ async function init(inReq, _outResp) {
 async function home(inReq, _outResp) {
     const classes = [ 
         { type_id: "TOPC1451559025546574", type_name: "动画大放映" }, 
-        { type_id: "TOPC1460958183626327", type_name: "2024中国诗词大会" },
+        { type_id: "TOPC1460958183626327", type_name: "中国诗词大会" },
         { type_id: "TOPC1451557970755294", type_name: "我爱发明2019" }, 
         { type_id: "TOPC1569314345479107", type_name: "我爱发明2023" }, 
          { type_id: "TOPC1451527941788652", type_name: "军事报道" }, 
