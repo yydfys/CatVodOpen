@@ -67,6 +67,9 @@ var index_config_default = {
     wobg: {
         url: "https://wobge.run.goorm.io"
     },
+    czzy: {
+        url: 'https://cz01.vip'
+    },
     ikanbot: {
         url: "https://www.aikanbot.com"
     },
@@ -74,7 +77,7 @@ var index_config_default = {
         url: "https://libvio.app"
     },
     live: {
-        url: "https://mirror.ghproxy.com/raw.githubusercontent.com/dxawi/0/main/tvlive.txt"
+        url: ['https://mirror.ghproxy.com/raw.githubusercontent.com/dxawi/0/main/tvlive.txt', 'https://agit.ai/Yoursmile7/TVBox/raw/branch/master/live.txt', 'http://home.jundie.top:81/Cat/tv/live.txt']
     },
     vcm3u8: {
         ffm3u8: [{
