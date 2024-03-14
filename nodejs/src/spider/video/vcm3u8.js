@@ -163,7 +163,7 @@ async function category(inReq, _outResp) {
             videos.push({
                 vod_id: tid.concat('=').concat(cls.type_id.toString()),
                 vod_name: n,
-                vod_pic : 'https://t.mwm.moe/',
+                vod_pic : 'https://t.mwm.moe/ycy',
                 vod_remarks: '',
                 cate: {},
             });
@@ -378,7 +378,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'vcm3u8',
-        name: '🍀 采集整合',
+        name: '🍀 采集合集',
         type: 3,
     },
     api: async (fastify) => {
