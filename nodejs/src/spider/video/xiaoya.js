@@ -1,4 +1,5 @@
-import { _ } from "../../util/cat.js";
+import pkg from 'lodash';
+const { _ } = pkg;
 import req from '../../util/req.js';
 import CryptoJS from 'crypto-js';
 
@@ -68,7 +69,7 @@ async function play(inReq, _outResp) {
 }
 async function search(inReq, _outResp) {
     // wd, quick
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const wd = inReq.body.wd;
     let page = pg || 1;
     if (page == 0) page = 1;

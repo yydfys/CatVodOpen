@@ -163,7 +163,7 @@ async function category(inReq, _outResp) {
             videos.push({
                 vod_id: tid.concat('=').concat(cls.type_id.toString()),
                 vod_name: n,
-                vod_pic : 'https://cdn0.techbang.com/system/excerpt_images/13258/original/aa7e71f45f4181a698133970d9326ec1.png',
+                vod_pic : 'https://t.mwm.moe/',
                 vod_remarks: '',
                 cate: {},
             });
