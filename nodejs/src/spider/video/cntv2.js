@@ -5,7 +5,7 @@ import { MOBILE_UA } from '../../util/misc.js';
 import req from '../../util/req.js';
 import CryptoJS from 'crypto-js';
 
-let key = '视聚场';
+let key = 'cntv2';
 let HOST = 'http://api.cntv.cn';
 
 async function request(reqUrl) {

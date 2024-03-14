@@ -1,25 +1,20 @@
 // 无搜索功能
-import { _ } from '../../util/cat.js';
-
+import pkg from 'lodash';
+const { _ } = pkg;
+import { MOBILE_UA } from '../../util/misc.js';
 import req from '../../util/req.js';
 import CryptoJS from 'crypto-js';
 
-let key = '视聚场';
+let key = 'cntv';
 let HOST = 'http://api.cntv.cn';
-let siteKey = '';
-let siteType = 0;
-const MOBILE_UA = 'Mozilla/5.0 (Linux; Android 11; M2007J3SC Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045714 Mobile Safari/537.36';
 
-async function request(reqUrl, agentSp) {
-    let res = await req(reqUrl, {
-        method: 'get',
+async function request(reqUrl) {
+ let resp = await req.get(reqUrl, {
         headers: {
-            'User-Agent': agentSp || MOBILE_UA,
+            'User-Agent': MOBILE_UA,
         },
     });
-
-    console.debug(res.data);
-    return res.data
+    return resp.data;
 }
 
 async function init(inReq, _outResp) {
@@ -115,31 +110,12 @@ async function home(inReq, _outResp) {
 }
 
 async function category(inReq, _outResp) {
-    // if (pg <= 0 || typeof pg == 'undefined') pg = 1;
+    let pg = inReq.body.page;
+    if (pg <= 0 || typeof pg == 'undefined') pg = 1;
 
     const tid = inReq.body.id;
-    let pg = inReq.body.page;
-    const extend = inReq.body.filters;
 
-	if(pg <= 0) pg = 1;
-
-    const data = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + pg + '&mode=0&serviceId=tvcctv'));
-
-    console.debug(data);
-
-    // 换普通处理方法
-    let  videos = [];
-    for (const vod of data.data.list) {
-        let a =  {
-        vod_id: vod.guid,
-        vod_name: vod.title,
-        vod_pic: vod.image,
-        // vod_remarks: vod.msg,
-        }
-        videos.push(a);
-     }
-
-     /*
+	    const data = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + pg + '&mode=0&serviceId=tvcctv'));
     let videos = _.map(data.data.list, (it) => {
         return {
             vod_id: it.guid,
@@ -147,7 +123,7 @@ async function category(inReq, _outResp) {
             vod_pic: it.image,
             vod_remarks: it.time || '',
         }
-    });*/
+    });
     const pgChk = (await request(HOST + '/NewVideo/getVideoListByColumn?id=' + tid + '&n=10&sort=desc&p=' + (parseInt(pg) + 1) + '&mode=0&serviceId=tvcctv')).data.list;
     const pgCount = pgChk.length > 0 ? parseInt(pg) + 1 : parseInt(pg);
     return JSON.stringify({
@@ -160,21 +136,19 @@ async function category(inReq, _outResp) {
 }
 
 async function detail(inReq, _outResp) {
-    const ids = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
-    const videos = [];
+    // const id = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
+     const id = inReq.body.id;
 
-    for (const id of ids) {
-        const vod = {
-            vod_id: id,
-            vod_remarks: '',
-        };
-        const playlist = ['点击播放' + '$' + 'https://hls.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/' + id + '/2000.m3u8'];
-        vod.vod_play_from = key;
-        vod.vod_play_url = playlist.join('#');
-        return JSON.stringify({
-            list: [vod],
-        });
-    }
+    const vod = {
+        vod_id: id,
+        vod_remarks: '',
+    };
+    const playlist = ['点击播放' + '$' + 'https://hls.cntv.myhwcdn.cn/asp/hls/2000/0303000a/3/default/' + id + '/2000.m3u8'];
+    vod.vod_play_from = key;
+    vod.vod_play_url = playlist.join('#');
+    return JSON.stringify({
+        list: [vod],
+    });
 }
 
 async function play(inReq, _outResp) {
