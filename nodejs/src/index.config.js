@@ -36,43 +36,43 @@ var index_config_default = {
         }
     },
     ali: {
-    token: "去网址https://alist.nn.ci/guide/drivers/aliyundrive_open.html获取32位token,填入32位token",
-    token280: "去https://messense-aliyundrive-webdav-backendrefresh-token-ucs0wn.streamlit.app/地址获取，填入280位token"
-  },
-  quark: {
-    cookie: "去https://h5.sm.cn/blm/mobile-entry-97/index#/，将浏览器设为PC模式，获取你的夸克cookie覆盖填入此处，形如_UP_A4A_11_=开头的"
-  },
-  xiaoya: {
-    url: "搭建属于你自己的小雅alist-tvbox，将地址填入此处，形如：http://192.168.0.222:4567/vod1/"
-  },
-  yiso: {
-    url: "https://yiso.fun",
-    cookie: "填入yiso网站的cookie即可"
-  },
-  ysche: {
-    url: "https://www.weixine.link/"
-  },
-  xxpan: {
-    url: "https://xpanpan.site"
-  },
-  wogg: {
-    url: "https://wogg.xyz"
-  },
-  wwgg: {
-    url: "http://www.kxys.site:3328"
-  },
-  tudou: {
-    url: "https://aliz.lvdoui.top"
-  },
-  wobg: {
-    url: "https://wobge.run.goorm.io"
-  },
-  ikanbot: {
-    url: "https://www.aikanbot.com"
-  },
-  live: {
-    url: "https://mirror.ghproxy.com/raw.githubusercontent.com/dxawi/0/main/tvlive.txt"
-  },
+        token: "去网址https://alist.nn.ci/guide/drivers/aliyundrive_open.html获取32位token,填入32位token",
+        token280: "去https://messense-aliyundrive-webdav-backendrefresh-token-ucs0wn.streamlit.app/地址获取，填入280位token"
+    },
+    quark: {
+        cookie: "去https://h5.sm.cn/blm/mobile-entry-97/index#/，将浏览器设为PC模式，获取你的夸克cookie覆盖填入此处，形如_UP_A4A_11_=开头的"
+    },
+    xiaoya: {
+        url: "搭建属于你自己的小雅alist-tvbox，将地址填入此处，形如：http://192.168.0.222:4567/vod1/"
+    },
+    yiso: {
+        url: "https://yiso.fun",
+        cookie: "填入yiso网站的cookie即可"
+    },
+    ysche: {
+        url: "https://www.weixine.link/"
+    },
+    xxpan: {
+        url: "https://xpanpan.site"
+    },
+    wogg: {
+        url: "https://wogg.xyz"
+    },
+    wwgg: {
+        url: "http://www.kxys.site:3328"
+    },
+    tudou: {
+        url: "https://aliz.lvdoui.top"
+    },
+    wobg: {
+        url: "https://wobge.run.goorm.io"
+    },
+    ikanbot: {
+        url: "https://www.aikanbot.com"
+    },
+    libvio: {
+        url: "https://libvio.app"
+    },
     live: {
         url: "https://mirror.ghproxy.com/raw.githubusercontent.com/dxawi/0/main/tvlive.txt"
     },
