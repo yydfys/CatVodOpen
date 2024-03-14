@@ -34,6 +34,7 @@ async function home(inReq, _outResp) {
         { type_id: "TOPC1451378857272262", type_name: "第一动画乐园" }, 
         { type_id: "TOPC1451557646802924", type_name: "健康之路" }, 
         { type_id: "TOPC1451558190239536", type_name: "走进科学" }, 
+        { type_id: "TOPC1451557970755294", type_name: "我爱发明" }, 
         { type_id: "TOPC1451557893544236", type_name: "探索·发现" }, 
         { type_id: "TOPC1451378967257534", type_name: "动物世界" }, 
         { type_id: "TOPC1451525103989666", type_name: "人与自然" }, 
