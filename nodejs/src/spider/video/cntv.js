@@ -6,7 +6,7 @@ import req from '../../util/req.js';
 import CryptoJS from 'crypto-js';
 
 let key = 'cntv';
-let HOST = 'http://tv.cctv.com';
+let HOST = 'https://tv.cctv.com';
 
 async function request(reqUrl) {
  let resp = await req.get(reqUrl, {
