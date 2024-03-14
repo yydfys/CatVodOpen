@@ -1,5 +1,6 @@
 // import { Crypto, load, _ } from '../../util/cat.js';
 import req from '../../util/req.js';
+import Crypto from 'crypto-js';
 
 import { load } from 'cheerio';
 
@@ -29,7 +30,7 @@ async function request(reqUrl, agentSp) {
 async function init(inReq, _outResp) {
     // siteKey = cfg.skey;
     // siteType = cfg.stype;
-    url = 'https://www.aikanbot.com';
+    url = inReq.server.config.ikanbot.url;
     return {};
 }
 
@@ -96,12 +97,14 @@ async function category(inReq, _outResp) {
     const $ = load(html);
     const items = $('div.v-list a.item');
     // var jsBase = await js2Proxy(true, siteType, siteKey, 'img/', {});
+
+    const proxyUrl = inReq.server.address().url + inReq.server.prefix + '/proxy/picurl';
     let videos = _.map(items, (item) => {
         const img = $(item).find('img:first')[0];
         return {
             vod_id: item.attribs.href,
             vod_name: img.attribs.alt,
-            vod_pic: '', // jsBase + base64Encode(img.attribs['data-src']),
+            vod_pic: proxyUrl + '/' + base64Encode(img.attribs['data-src']),
             vod_remarks: '',
         };
     });
@@ -229,28 +232,23 @@ function base64Decode(text) {
     return Crypto.enc.Utf8.stringify(Crypto.enc.Base64.parse(text));
 }
 
-async function proxy(segments, headers) {
-    let what = segments[0];
-    let url = base64Decode(segments[1]);
-    if (what == 'img') {
-        var resp = await req(url, {
-            buffer: 2,
+async function proxy(inReq, outResp) {
+    const site = inReq.params.site;
+    const what = inReq.params.what;
+    if (site == 'picurl') {
+        const t = base64Decode(what)
+        var resp = await req(t, {
+            // buffer: 2,
             headers: {
                 Referer: url,
                 'User-Agent': UA,
             },
+            responseType: 'arraybuffer',
+            
         });
-        return JSON.stringify({
-            code: resp.code,
-            buffer: 2,
-            content: resp.content,
-            headers: resp.headers,
-        });
+        // outResp.code(200).content = resp.data;
+        outResp.code(200).headers('Content-Type', resp.headers['Content-Type']).send(resp.data);
     }
-    return JSON.stringify({
-        code: 500,
-        content: '',
-    });
 }
 
 async function play(inReq, _outResp) {
@@ -262,7 +260,7 @@ async function play(inReq, _outResp) {
 }
 
 async function search(inReq, _outResp) {
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const wd = inReq.body.wd;
     let page = pg || 1;
     if (page == 0) page = 1;
@@ -380,6 +378,7 @@ export default {
         fastify.post('/detail', detail);
         fastify.post('/play', play);
         fastify.post('/search', search);
+        fastify.get('/proxy/:site/:what', proxy);
         fastify.get('/test', test);
     },
 };
