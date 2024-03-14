@@ -31,7 +31,7 @@ async function init(inReq, _outResp) {
 async function home(inReq, _outResp) {
     const classes = [ 
         { type_id: "TOPC1451559025546574", type_name: "动画大放映" }, 
-        { type_id: "TOPC1460958183626327", type_name: "中国诗词大会" },
+        { type_id: "TOPC1460958183626327", type_name: "2024中国诗词大会" },
         { type_id: "TOPC1451557970755294", type_name: "我爱发明2019" }, 
         { type_id: "TOPC1569314345479107", type_name: "我爱发明2023" }, 
          { type_id: "TOPC1451527941788652", type_name: "军事报道" }, 
@@ -39,8 +39,13 @@ async function home(inReq, _outResp) {
         { type_id: "TOPC1451526241359341", type_name: "讲武堂" }, 
         { type_id: "TOPC1451378857272262", type_name: "第一动画乐园" }, 
         { type_id: "TOPC1451557646802924", type_name: "健康之路" }, 
+        { type_id: "TOPC1451525396109388", type_name: "我有传家宝" }, 
+        { type_id: "TOPC1579169060379297", type_name: "挑战不可能" }, 
+         { type_id: "TOPC1451379250581117", type_name: "国际艺苑" }, 
+         { type_id: "TOPC1460958183626327", type_name: "经典咏流传·正青春" }, 
         { type_id: "TOPC1451558190239536", type_name: "走进科学" }, 
         { type_id: "TOPC1451557893544236", type_name: "探索·发现" }, 
+        { type_id: "TOPC1554187056533820", type_name: "秘境之眼" }, 
         { type_id: "TOPC1451378967257534", type_name: "动物世界" }, 
         { type_id: "TOPC1451525103989666", type_name: "人与自然" }, 
         { type_id: "TOPC1451558150787467", type_name: "自然传奇" }, 

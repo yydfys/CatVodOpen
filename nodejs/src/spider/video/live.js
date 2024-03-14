@@ -4,6 +4,7 @@ const { _ } = pkg;
 import { MAC_UA } from '../../util/misc.js';
 
 let live = '';
+let exts = [];
 
 function getHeader() {
     let header = {};
@@ -32,9 +33,10 @@ function extract(line, reg) {
 }
 
 function m3u(text) {
+    if(!groups){
     groups = {};
     channels = {};
-
+    }
     let channel = {'name':'', 'url':'', 'logo':''};
     let group = '默认';
 
@@ -64,10 +66,10 @@ function m3u(text) {
 }
 
 function txt(text) {
-
+    if(!groups){
     groups = {};
     channels = {};
-
+    }
     let group = '默认';
     for(var line of text.split(/\n|<br>/)) {
         let split = line.split(',');
@@ -93,12 +95,14 @@ function txt(text) {
 
 // cfg = {skey: siteKey, ext: extend}
 async function init(inReq, _outRes) {
-    let ext = inReq.server.config.live.url;
+    exts = inReq.server.config.live.url;
+    for(const ext of exts){
     live = await getString(ext, getHeader());
     if (live.startsWith('#EXTM3U')) {
         m3u(live);
     } else {
         txt(live);
+    }
     }
 }
 
@@ -116,13 +120,10 @@ async function home(inReq, _outResp) {
     });
 }
 
-async function homeVod() {
-    return '{}';
-}
 
 async function category(inReq, _outResp) {
     const tid = inReq.body.id;
-    let pg = inReq.body.page;
+    const pg = inReq.body.page;
     if (_.isEmpty(channels[tid])) return '{}';
     let videos = [];
     for (let channelName in channels[tid]) {
@@ -138,8 +139,7 @@ async function category(inReq, _outResp) {
             vod_pic: pic,
             vod_remarks: '',
         });
-    }
-
+}
     return ({
         page: parseInt(pg),
         pagecount: 1,
@@ -183,7 +183,6 @@ async function detail(inReq, _outResp) {
     let result = ({
         list: [vod],
     });
-
     return result;
 }
 
