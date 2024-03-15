@@ -168,46 +168,6 @@ async function detail(inReq, _outResp) {
         });
         vod.vod_play_url = vod_play_url.join('$$$');
         videos.push(vod);
-
-        /* 借ysche的方法重新处理视频播放地址
-        const shareUrls = $('div.module-row-info p')
-            .map((_, p) => p.children[0].data)
-            .get();
-        const froms = [];
-        const urls = [];
-        for (const shareUrl of shareUrls) {
-            const shareData = Ali.getShareData(shareUrl);
-            if (shareData) {
-                const videos = await Ali.getFilesByShareUrl(shareData);
-                if (videos.length > 0) {
-                    froms.push('Ali-' + shareData.shareId);
-                    urls.push(
-                        videos
-                            .map((v) => {
-                                const ids = [v.share_id, v.file_id, v.subtitle ? v.subtitle.file_id : ''];
-                                return formatPlayUrl('', v.name) + '$' + ids.join('*');
-                            })
-                            .join('#'),
-                    );
-                }
-            } else {
-                const shareData = Quark.getShareData(shareUrl);
-                if (shareData) {
-                    const videos = await Quark.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        froms.push('Quark-' + shareData.shareId);
-                        urls.push(
-                            videos
-                                .map((v) => {
-                                    const ids = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                                    return formatPlayUrl('', v.file_name) + '$' + ids.join('*');
-                                })
-                                .join('#'),
-                        );
-                    }
-                }
-            }
-        }*/
     }
     return JSON.stringify({
         list: videos,
@@ -460,7 +420,7 @@ async function test(inReq, outResp) {
             if (dataResult.category.list.length > 0) {
                 resp = await inReq.server.inject().post(`${prefix}/detail`).payload({
                     // id: dataResult.category.list[0].vod_id, // dataResult.category.list.map((v) => v.vod_id),
-                    id: 714890831
+                    id: 714891189
                 });
                 dataResult.detail = resp.json();
                 printErr(resp.json());
@@ -504,7 +464,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'libvio',
-        name: '🍀 LIBVIO影视(暂时BD路线可用)',
+        name: '🍀 LIBO影视',
         type: 3,
     },
     api: async (fastify) => {

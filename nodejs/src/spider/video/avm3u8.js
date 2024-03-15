@@ -25,7 +25,7 @@ async function request4category(reqUrl) {
 }
 
 async function init(inReq, _outResp) {
-    srcobj = inReq.server.config.vcm3u8;
+    srcobj = inReq.server.config.avm3u8;
     return {};
 }
 
@@ -369,8 +369,8 @@ async function test(inReq, outResp) {
 
 export default {
     meta: {
-        key: 'vcm3u8',
-        name: '🍀 采集整合',
+        key: 'avm3u8',
+        name: '🍀 涩涩采集',
         type: 3,
     },
     api: async (fastify) => {
