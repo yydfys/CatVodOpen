@@ -34,7 +34,7 @@ async function init(inReq, _outResp) {
 }
 
 async function home(inReq, _outResp) {
-    const classes = [{'type_id':'all','type_name':'all'}];
+    const classes = [{'type_id':'ali-yun-pan-list','type_name':'阿里云盘'},{'type_id':'kua-ke-wang-pan-list','type_name':'夸克云盘'}];
     const filterObj = {};
     return {
         class: classes,
@@ -44,12 +44,13 @@ async function home(inReq, _outResp) {
 
 async function category(inReq, _outResp) {
     let pg = inReq.body.page;
+    const tid = inReq.body.id;
     if (pg <= 0) pg = 1;
     let page = '';
     if (pg > 1) {
         page = '/page/' + pg;
     }
-    const html = await request(url + page + '/');
+    const html = await request(url + '/category/' + tid +page + '/');
     return parseHtmlList(html, pg);
 }
 
@@ -398,7 +399,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'xxpan',
-        name: '🍀 小盘资源',
+        name: '🍀 小盘盘盘',
         type: 3,
     },
     api: async (fastify) => {
