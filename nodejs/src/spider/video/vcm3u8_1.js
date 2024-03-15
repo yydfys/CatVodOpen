@@ -1,9 +1,7 @@
 import * as HLS from 'hls-parser';
-import req from '../../util/req.js';  
-import { load } from 'cheerio';
-import pkg from 'lodash';
-const { _ } = pkg;
+import req from '../../util/req.js';
 
+//let url = 'https://cj.ffzyapi.com/api.php/provide/vod/from/ffm3u8/';
 let srcobj = {};
 
 async function request(reqUrl) {
@@ -13,91 +11,77 @@ async function request(reqUrl) {
     return res.data;
 }
 
-async function request4category(reqUrl) {
-    try {
-        let res = await req(reqUrl, {
-            method: 'get',
-        });
-        return { url: reqUrl, data: res.data };
-    } catch (error) {
-        return {}
-    }
-}
-
 async function init(inReq, _outResp) {
     srcobj = inReq.server.config.vcm3u8;
     return {};
 }
 
 async function home(_inReq, _outResp) {
-    let classes = [];
-    let filterObj = {};
+    let classes = [];        
 
-    /*classes = Object.keys(srcobj).map(key => ({
-        type_id: key,
-        type_name: srcobj[key][0].name,
-    }));*/
-
-    const promiseList = _.map(srcobj, (link) => {
-        return request4category(link[0].url);
-    });
-    try {
-        await Promise.all(promiseList).then(res=> {
-            console.log(res)
-            _.map(res, (o) => {
-                // srcobj要进行取key值处理
-                for (let key of Object.keys(srcobj)) {
-                    let itemValues = srcobj[key];
-                    let iUrl = itemValues[0].url;
-                    if (iUrl === o.url) {
-                        let categories = itemValues[0].categories;
-                        
-                        // 在这里取返回的data进行处理
-                        let data = o.data;
-
-                        // 填充
-                        classes.push({
-                            type_id: key,
-                            type_name: itemValues[0].name,
-                        });
-
-                        let type = {
-                            key: 'category',
-                            name: '类型',
-                        };
-                        let filterAll = [];
-                        let typeValues = [];
-                        for (const cls of data.class) {
-                            const n = cls.type_name.toString().trim();
-                            if (categories && categories.length > 0) {
-                                if (categories.indexOf(n) < 0) continue;
-                            }
-                            typeValues.push({ n: n, v: cls.type_id.toString() });
-                        }
-                        if (categories && categories.length > 0) {
-                            typeValues = typeValues.sort((a, b) => {
-                                return categories.indexOf(a.n) - categories.indexOf(b.n);
-                            });
-                        }
-                        type['init'] = typeValues[0].v;
-                        type['value'] = typeValues;
-                        filterAll.push(type);
-                        filterObj[key] = filterAll;
-                    } 
-                }
-            });
-            return {
-                class: classes,
-                filters: filterObj,
-            };
-          })
-    } catch (error) {
-        console.log(error);
+    /* json obj arrary 取key名及值的方法
+    for (let i = 0; i < Object.keys(srcobj).length; i++) {
+        classes.push({
+            type_id: Object.keys(srcobj)[i],
+            type_name: Object.values(srcobj)[i][0].name,
+        });
     }
     
+    classes = Object.keys(srcobj).map(function(key) {
+        return {
+          type_id: key,
+          type_name: srcobj[key][0].name,
+        };
+      });
+    */
+
+    classes = Object.keys(srcobj).map(key => ({
+        type_id: key,
+        type_name: srcobj[key][0].name,
+    }));
+
+    //第三种,写在home里,理论上可行,但会一口气全发所有配置,配置1站就发1,100就发100,不建议
+    /*
+    let filterObj = {};
+    for (let i = 0; i < Object.keys(srcobj).length; i++) {
+        let urlsrc = Object.values(srcobj)[i][0].url;
+        let categories = Object.values(srcobj)[i][0].categories;
+        let data = null;
+        try {
+            data = await request(urlsrc);
+        } catch (error) {
+            continue;
+        }
+        if (data.length == 0) continue;
+        let type = {
+            key: 'category',
+            name: '类型',
+        };
+        let filterAll = [];
+        let typeValues = [];
+        for (const cls of data.class) {
+            const n = cls.type_name.toString().trim();
+            if (categories && categories.length > 0) {
+                if (categories.indexOf(n) < 0) continue;
+            }
+            typeValues.push({ n: n, v: cls.type_id.toString() });
+        }
+        if (categories && categories.length > 0) {
+            typeValues = typeValues.sort((a, b) => {
+                return categories.indexOf(a.n) - categories.indexOf(b.n);
+            });
+        }
+        type['init'] = typeValues[0].v;
+        type['value'] = typeValues;
+        filterAll.push(type);
+        filterObj[Object.keys(srcobj)[i]] = filterAll;
+    }
+    */
+
     return {
         class: classes,
-        filters: filterObj,
+        //第三种
+        //filters: filterObj,
     };
 }
 
@@ -107,16 +91,19 @@ async function category(inReq, _outResp) {
     let page = pg || 1;
     if (page == 0) page = 1;
     let videos = [];
-    const extend = inReq.body.filters;
-    let url = srcobj[tid][0].url;
-    let data = null;
     
+
+    /*
+    const extend = inReq.body.filters;
+    let url = srcobj[tid][0].url;    
+    let data = null;
     try {
         data = await request(url + `?ac=detail&t=${extend.category || ''}&pg=${page}`);
     } catch (error) {
         return {};
     }
     if (data.length == 0) return {};    
+    //console.log('fpplog extend.category1: ' + extend.category);
     for (const vod of data.list) {
         videos.push({
             vod_id: tid.concat('=').concat(vod.vod_id.toString()),
@@ -125,25 +112,88 @@ async function category(inReq, _outResp) {
             vod_remarks: vod.vod_remarks,
         });
     }
+    //console.log('fpplog extend.url: ' + url);
     return {
         page: parseInt(data.page),
         pagecount: data.pagecount,
         total: data.total,
         list: videos,
     };
+    */
+
+
+    if (tid.includes('=')) {
+        let url = srcobj[tid.split('=')[0]][0].url;
+        let data = null;
+        try {
+            data = await request(url + `?ac=detail&t=${tid.split('=')[1]}&pg=${page}`);
+        } catch (error) {
+            return {};
+        }
+        if (data.length == 0) return {};  
+        for (const vod of data.list) {
+            videos.push({
+                vod_id: tid.split('=')[0].concat('=').concat(vod.vod_id.toString()),
+                vod_name: vod.vod_name.toString(),
+                vod_pic: vod.vod_pic,
+                vod_remarks: vod.vod_remarks,
+            });
+        }
+        return {
+            page: parseInt(data.page),
+            pagecount: data.pagecount,
+            total: data.total,
+            list: videos,
+        };
+    } else {
+        let url = srcobj[tid][0].url;
+        let categories = srcobj[tid][0].categories;
+        let data = null;
+        try {
+            data = await request(url);
+        } catch (error) {
+            return {};
+        }
+        if (data.length == 0) return {};  
+        for (const cls of data.class) {
+            const n = cls.type_name.toString().trim();
+            if (categories && categories.length > 0) {
+                if (categories.indexOf(n) < 0) continue;
+            }
+            videos.push({
+                vod_id: tid.concat('=').concat(cls.type_id.toString()),
+                vod_name: n,
+                vod_pic : 'https://t.mwm.moe/ycy',
+                vod_remarks: '',
+                cate: {},
+            });
+        }
+        if (categories && categories.length > 0) {
+            videos = videos.sort((a, b) => {
+                return categories.indexOf(a.vod_name) - categories.indexOf(b.vod_name);
+            });
+        }
+        return {
+            page: 1,
+            pagecount: Math.ceil(videos.length / 30),
+            limit: 30,
+            total: videos.length,
+            list: videos,                  
+        };
+    }
 }
 
 async function detail(inReq, _outResp) {
     const ids = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
     const videos = [];
-    for (const id of ids) {        
+    for (const id of ids) {
         let data = null;
         try {
             data = (await request(id.includes('http') ? id : srcobj[id.split('=')[0]][0].url + `?ac=detail&ids=${id.split('=')[1]}`)).list[0];
         } catch (error) {
             continue;
         }
-        if (data.length == 0) continue;   
+        if (data.length == 0) continue;
         let vod = {
             vod_id: data.vod_id,
             vod_name: data.vod_name,
@@ -273,7 +323,8 @@ async function test(inReq, outResp) {
         printErr(resp.json());
         if (dataResult.home.class.length > 0) {
             resp = await inReq.server.inject().post(`${prefix}/category`).payload({
-                id: dataResult.home.class[0].type_id,                
+                id: dataResult.home.class[0].type_id,
+                //id: 'ffm3u8/13',
                 page: 1,
                 filter: true,
                 filters: {},
@@ -282,7 +333,8 @@ async function test(inReq, outResp) {
             printErr(resp.json());
             if (dataResult.category.list.length > 0) {
                 resp = await inReq.server.inject().post(`${prefix}/detail`).payload({
-                    id: dataResult.category.list[0].vod_id, // dataResult.category.list.map((v) => v.vod_id),                    
+                    id: dataResult.category.list[0].vod_id, // dataResult.category.list.map((v) => v.vod_id),
+                    //id: 'https://subocaiji.com/api.php/provide/vod/from/subm3u8/?ac=detail&ids=55606',
                 });
                 dataResult.detail = resp.json();
                 printErr(resp.json());
@@ -326,7 +378,7 @@ async function test(inReq, outResp) {
 export default {
     meta: {
         key: 'vcm3u8',
-        name: '🍀 采集整合',
+        name: '🍀 采集合集',
         type: 3,
     },
     api: async (fastify) => {
