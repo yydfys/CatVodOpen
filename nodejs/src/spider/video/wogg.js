@@ -68,7 +68,7 @@ function getHrefInfoIdx(data) {
 
 async function category(inReq, _outResp) {
     const tid = inReq.body.id;
-    let pg = inReq.body.page;
+    const pg = inReq.body.page;
     const extend = inReq.body.filters;
     let page = pg || 1;
     if (page == 0) page = 1;
@@ -419,7 +419,7 @@ async function play(inReq, _outResp) {
 
 
 async function search(inReq, _outResp) {
-    let pg = inReq.body.page;
+    const pg = inReq.body.page;
     const wd = inReq.body.wd;
     let page = pg || 1;
     if (page == 0) page = 1;
