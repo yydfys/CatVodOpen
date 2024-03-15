@@ -2,18 +2,19 @@ import req from '../../util/req.js';
 import { MAC_UA, formatPlayUrl } from '../../util/misc.js';
 import { load } from 'cheerio';
 import * as HLS from 'hls-parser';
-import { getDownload, getFilesByShareUrl, getLiveTranscoding, getShareData, initAli } from '../../util/ali.js';
+import * as Ali from '../../util/ali.js';
+import * as Quark from '../../util/quark.js';
 import dayjs from 'dayjs';
 
 let url = '';
 
 async function request(reqUrl) {
-    const resp = await req.get(reqUrl, {
+    const res = await req.get(reqUrl, {
         headers: {
             'User-Agent': MAC_UA,
         },
     });
-    return resp.data;
+    return res.data;
 }
 
 // ali token 相关配置放在 index.config.js
@@ -28,7 +29,8 @@ wogg: {
 */
 async function init(inReq, _outResp) {
     url = inReq.server.config.wogg.url;
-    await initAli(inReq.server.db, inReq.server.config.ali);
+    await Ali.initAli(inReq.server.db, inReq.server.config.ali);
+    await Quark.initQuark(inReq.server.db, inReq.server.config.quark);
     return {};
 }
 
@@ -66,7 +68,7 @@ function getHrefInfoIdx(data) {
 
 async function category(inReq, _outResp) {
     const tid = inReq.body.id;
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const extend = inReq.body.filters;
     let page = pg || 1;
     if (page == 0) page = 1;
@@ -186,7 +188,7 @@ async function detail(inReq, _outResp) {
             vod_year: year,
             vod_actor: actor.join(', '),
             vod_director: director.join(', '),
-            vod_content: $('p.sqjj_a').text().trim().replace('[收起部分]', ''),
+            vod_content: $('div.video-info-content p[style*=none]')[0].children[0].data.trim(),
         };
 
         const shareUrls = $('div.module-row-info p')
@@ -195,11 +197,11 @@ async function detail(inReq, _outResp) {
         const froms = [];
         const urls = [];
         for (const shareUrl of shareUrls) {
-            const shareData = getShareData(shareUrl);
+            const shareData = Ali.getShareData(shareUrl);
             if (shareData) {
-                const videos = await getFilesByShareUrl(shareData);
+                const videos = await Ali.getFilesByShareUrl(shareData);
                 if (videos.length > 0) {
-                    froms.push(shareData.shareId);
+                    froms.push('Ali-' + shareData.shareId);
                     urls.push(
                         videos
                             .map((v) => {
@@ -208,6 +210,22 @@ async function detail(inReq, _outResp) {
                             })
                             .join('#'),
                     );
+                }
+            } else {
+                const shareData = Quark.getShareData(shareUrl);
+                if (shareData) {
+                    const videos = await Quark.getFilesByShareUrl(shareData);
+                    if (videos.length > 0) {
+                        froms.push('Quark-' + shareData.shareId);
+                        urls.push(
+                            videos
+                                .map((v) => {
+                                    const ids = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
+                                    return formatPlayUrl('', v.file_name) + '$' + ids.join('*');
+                                })
+                                .join('#'),
+                        );
+                    }
                 }
             }
         }
@@ -220,112 +238,188 @@ async function detail(inReq, _outResp) {
     };
 }
 
-const transcodingCache = {};
-const downloadingCache = {};
+const aliTranscodingCache = {};
+const aliDownloadingCache = {};
+
+const quarkTranscodingCache = {};
+const quarkDownloadingCache = {};
 
 async function proxy(inReq, outResp) {
-    await initAli(inReq.server.db, inReq.server.config.ali);
+    await Ali.initAli(inReq.server.db, inReq.server.config.ali);
+    await Quark.initQuark(inReq.server.db, inReq.server.config.quark);
+    const site = inReq.params.site;
     const what = inReq.params.what;
     const shareId = inReq.params.shareId;
     const fileId = inReq.params.fileId;
-    if (what == 'trans') {
+    if (site == 'ali') {
+        if (what == 'trans') {
+            const flag = inReq.params.flag;
+            const end = inReq.params.end;
+
+            if (aliTranscodingCache[fileId]) {
+                const purl = aliTranscodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0].url;
+                if (parseInt(purl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
+                    delete aliTranscodingCache[fileId];
+                }
+            }
+
+            if (aliTranscodingCache[fileId] && end.endsWith('.ts')) {
+                const transcoding = aliTranscodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0];
+                if (transcoding.plist) {
+                    const tsurl = transcoding.plist.segments[parseInt(end.replace('.ts', ''))].suri;
+                    if (parseInt(tsurl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
+                        delete aliTranscodingCache[fileId];
+                    }
+                }
+            }
+
+            if (!aliTranscodingCache[fileId]) {
+                const transcoding = await Ali.getLiveTranscoding(shareId, fileId);
+                aliTranscodingCache[fileId] = transcoding;
+            }
+
+            const transcoding = aliTranscodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0];
+            if (!transcoding.plist) {
+                const resp = await req.get(transcoding.url, {
+                    headers: {
+                        'User-Agent': MAC_UA,
+                    },
+                });
+                transcoding.plist = HLS.parse(resp.data);
+                for (const s of transcoding.plist.segments) {
+                    if (!s.uri.startsWith('http')) {
+                        s.uri = new URL(s.uri, transcoding.url).toString();
+                    }
+                    s.suri = s.uri;
+                    s.uri = s.mediaSequenceNumber.toString() + '.ts';
+                }
+            }
+
+            if (end.endsWith('.ts')) {
+                outResp.redirect(transcoding.plist.segments[parseInt(end.replace('.ts', ''))].suri);
+                return;
+            } else {
+                const hls = HLS.stringify(transcoding.plist);
+                let hlsHeaders = {
+                    'content-type': 'audio/x-mpegurl',
+                    'content-length': hls.length.toString(),
+                };
+                outResp.code(200).headers(hlsHeaders);
+                return hls;
+            }
+        } else {
+            const flag = inReq.params.flag;
+            if (aliDownloadingCache[fileId]) {
+                const purl = aliDownloadingCache[fileId].url;
+                if (parseInt(purl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
+                    delete aliDownloadingCache[fileId];
+                }
+            }
+            if (!aliDownloadingCache[fileId]) {
+                const down = await Ali.getDownload(shareId, fileId, flag == 'down');
+                aliDownloadingCache[fileId] = down;
+            }
+            outResp.redirect(aliDownloadingCache[fileId].url);
+            return;
+        }
+    } else if (site == 'quark') {
+        let downUrl = '';
+        const ids = fileId.split('*');
         const flag = inReq.params.flag;
-        const end = inReq.params.end;
-
-        if (transcodingCache[fileId]) {
-            const purl = transcodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0].url;
-            if (parseInt(purl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
-                delete transcodingCache[fileId];
+        if (what == 'trans') {
+            if (!quarkTranscodingCache[ids[1]]) {
+                quarkTranscodingCache[ids[1]] = (await Quark.getLiveTranscoding(shareId, decodeURIComponent(ids[0]), ids[1], ids[2])).filter((t) => t.accessable);
             }
-        }
-
-        if (transcodingCache[fileId] && end.endsWith('.ts')) {
-            const transcoding = transcodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0];
-            if (transcoding.plist) {
-                const tsurl = transcoding.plist.segments[parseInt(end.replace('.ts', ''))].suri;
-                if (parseInt(tsurl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
-                    delete transcodingCache[fileId];
-                }
-            }
-        }
-
-        if (!transcodingCache[fileId]) {
-            const transcoding = await getLiveTranscoding(shareId, fileId);
-            transcodingCache[fileId] = transcoding;
-        }
-
-        const transcoding = transcodingCache[fileId].filter((t) => t.template_id.toLowerCase() == flag)[0];
-        if (!transcoding.plist) {
-            const resp = await req.get(transcoding.url, {
-                headers: {
-                    'User-Agent': MAC_UA,
-                },
-            });
-            transcoding.plist = HLS.parse(resp.data);
-            for (const s of transcoding.plist.segments) {
-                if (!s.uri.startsWith('http')) {
-                    s.uri = new URL(s.uri, transcoding.url).toString();
-                }
-                s.suri = s.uri;
-                s.uri = s.mediaSequenceNumber.toString() + '.ts';
-            }
-        }
-
-        if (end.endsWith('.ts')) {
-            outResp.redirect(transcoding.plist.segments[parseInt(end.replace('.ts', ''))].suri);
+            downUrl = quarkTranscodingCache[ids[1]].filter((t) => t.resolution.toLowerCase() == flag)[0].video_info.url;
+            outResp.redirect(downUrl);
             return;
         } else {
-            const hls = HLS.stringify(transcoding.plist);
-            let hlsHeaders = {
-                'content-type': 'audio/x-mpegurl',
-                'content-length': hls.length.toString(),
-            };
-            outResp.code(200).headers(hlsHeaders);
-            return hls;
-        }
-    } else {
-        if (downloadingCache[fileId]) {
-            const purl = downloadingCache[fileId].url;
-            if (parseInt(purl.match(/x-oss-expires=(\d+)/)[1]) - dayjs().unix() < 15) {
-                delete downloadingCache[fileId];
+            if (!quarkDownloadingCache[ids[1]]) {
+                const down = await Quark.getDownload(shareId, decodeURIComponent(ids[0]), ids[1], ids[2], flag == 'down');
+                if (down) quarkDownloadingCache[ids[1]] = down;
+            }
+            downUrl = quarkDownloadingCache[ids[1]].download_url;
+            if (flag == 'redirect') {
+                outResp.redirect(downUrl);
+                return;
             }
         }
-        if (!downloadingCache[fileId]) {
-            const down = await getDownload(shareId, fileId);
-            downloadingCache[fileId] = down;
-        }
-        outResp.redirect(downloadingCache[fileId].url);
-        return;
+        return await Quark.chunkStream(
+            inReq,
+            outResp,
+            downUrl,
+            ids[1],
+            Object.assign(
+                {
+                    Cookie: Quark.cookie,
+                },
+                Quark.baseHeader,
+            ),
+        );
     }
 }
 
 async function play(inReq, _outResp) {
+    const flag = inReq.body.flag;
     const id = inReq.body.id;
     const ids = id.split('*');
-    const transcoding = await getLiveTranscoding(ids[0], ids[1]);
-    transcoding.sort((a, b) => b.template_width - a.template_width);
-    const urls = [];
-    const proxyUrl = inReq.server.address().url + inReq.server.prefix + '/proxy';
-    transcoding.forEach((t) => {
-        urls.push(t.template_id);
-        urls.push(`${proxyUrl}/trans/${t.template_id.toLowerCase()}/${ids[0]}/${ids[1]}/.m3u8`);
-    });
-    urls.push('SRC');
-    urls.push(`${proxyUrl}/src/nil/${ids[0]}/${ids[1]}/.bin`);
-    const result = {
-        parse: 0,
-        url: urls,
-    };
-    if (ids[2]) {
-        result.extra = {
-            subt: `${proxyUrl}/src/nil/${ids[0]}/${ids[2]}/.bin`,
+    if (flag.startsWith('Ali-')) {
+        const transcoding = await Ali.getLiveTranscoding(ids[0], ids[1]);
+        aliTranscodingCache[ids[1]] = transcoding;
+        transcoding.sort((a, b) => b.template_width - a.template_width);
+        const urls = [];
+        const proxyUrl = inReq.server.address().url + inReq.server.prefix + '/proxy/ali';
+        transcoding.forEach((t) => {
+            urls.push(t.template_id);
+            urls.push(`${proxyUrl}/trans/${t.template_id.toLowerCase()}/${ids[0]}/${ids[1]}/.m3u8`);
+        });
+        urls.push('SRC');
+        urls.push(`${proxyUrl}/src/down/${ids[0]}/${ids[1]}/.bin`);
+        const result = {
+            parse: 0,
+            url: urls,
         };
+        if (ids[2]) {
+            result.extra = {
+                subt: `${proxyUrl}/src/subt/${ids[0]}/${ids[2]}/.bin`,
+            };
+        }
+        return result;
+    } else if (flag.startsWith('Quark-')) {
+        const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
+        quarkTranscodingCache[ids[2]] = transcoding;
+        const urls = [];
+        const proxyUrl = inReq.server.address().url + inReq.server.prefix + '/proxy/quark';
+        transcoding.forEach((t) => {
+            urls.push(t.resolution.toUpperCase());
+            urls.push(`${proxyUrl}/trans/${t.resolution.toLowerCase()}/${ids[0]}/${encodeURIComponent(ids[1])}*${ids[2]}*${ids[3]}/.mp4`);
+        });
+        urls.push('SRC');
+        urls.push(`${proxyUrl}/src/redirect/${ids[0]}/${encodeURIComponent(ids[1])}*${ids[2]}*${ids[3]}/.bin`);
+        urls.push('SRC_Proxy');
+        urls.push(`${proxyUrl}/src/down/${ids[0]}/${encodeURIComponent(ids[1])}*${ids[2]}*${ids[3]}/.bin`);
+        const result = {
+            parse: 0,
+            url: urls,
+            header: Object.assign(
+                {
+                    Cookie: Quark.cookie,
+                },
+                Quark.baseHeader,
+            ),
+        };
+        if (ids[3]) {
+            result.extra = {
+                subt: `${proxyUrl}/src/subt/${ids[0]}/${encodeURIComponent(ids[1])}*${ids[4]}*${ids[5]}/.bin`,
+            };
+        }
+        return result;
     }
-    return result;
 }
 
+
 async function search(inReq, _outResp) {
-    const pg = inReq.body.page;
+    let pg = inReq.body.page;
     const wd = inReq.body.wd;
     let page = pg || 1;
     if (page == 0) page = 1;
@@ -348,6 +442,8 @@ async function search(inReq, _outResp) {
         list: videos,
     };
 }
+
+
 
 async function test(inReq, outResp) {
     try {
@@ -429,7 +525,7 @@ export default {
         fastify.post('/detail', detail);
         fastify.post('/play', play);
         fastify.post('/search', search);
-        fastify.get('/proxy/:what/:flag/:shareId/:fileId/:end', proxy);
+        fastify.get('/proxy/:site/:what/:flag/:shareId/:fileId/:end', proxy);
         fastify.get('/test', test);
     },
 };
