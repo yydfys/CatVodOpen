@@ -38,7 +38,7 @@ async function init(inReq, _outResp) {
 
 
 async function home(filter) {
-    const classes = [{'type_id':'home','type_name':'首页'}];
+    const classes = [{'type_id':'1','type_name':'阿里云盘'},{'type_id':'2','type_name':'夸克云盘'}];
     const filterObj = {};
     return {
         class: classes,
@@ -48,12 +48,14 @@ async function home(filter) {
 
 
 async function category(inReq, _outResp) {
+    const tid = inReq.body.id;
     let pg = inReq.body.page;
     if (pg <= 0) pg = 1;
     const limit = 30;
     const params = {
         pageSize: limit,
         pageNum: pg,
+        root: tid,
     };
     const resp = await request(url + '/ali/all', params);
     return parseVodList(resp, pg, limit);
