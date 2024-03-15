@@ -3,7 +3,7 @@ import { MOBILE_UA } from '../../util/misc.js';
 import { load } from 'cheerio';
 
 
-let url = 'https://godamanga.com';
+let url = 'https://cn.godamanga.site';
 
 async function request(reqUrl) {
     let resp = await req.get(reqUrl, {
@@ -36,7 +36,7 @@ async function home(_inReq, _outResp) {
 
 async function category(inReq, _outResp) {
     const tid= inReq.body.id;
-    const pg =inReq.body.page;
+    let pg =inReq.body.page;
     let page = pg || 1;
     if (page == 0) page = 1;
     var html = await request(url + `/${tid}/page/${page}`);
