@@ -38,7 +38,7 @@ import _13bqg from './spider/book/13bqg.js';
 import goda from './spider/book/goda.js';
 import laobaigs from './spider/book/laobaigs.js';
 import baozimh from './spider/book/baozimh.js';
-import bokan from './spider/book/bookan.js';
+import bookan from './spider/book/bookan.js';
 import copymanga from './spider/book/copymanga.js';
 import vcm3u8 from './spider/video/vcm3u8.js';
 import avm3u8 from './spider/video/avm3u8.js';
