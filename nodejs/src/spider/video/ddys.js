@@ -4,7 +4,7 @@ import pkg from 'lodash';
 const { _ } = pkg;
 import { load } from 'cheerio';
 
-let DOMAIN = 'ddys.pro/';
+let DOMAIN = 'ddys.mov';
 let HOST = 'https://' + DOMAIN;
 let PLAY_HOST = 'https://v.' + DOMAIN;
 const FROM_DIRECT = '直连';
