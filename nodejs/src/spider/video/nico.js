@@ -4,7 +4,7 @@ import { load } from 'cheerio';
 import { PC_UA } from '../../util/misc.js';
 
 
-let url = 'http://help.nicotv.life/';
+let url = 'http://www.nicotv.life/';
 const headers = {
     'User-Agent': PC_UA,
 };
