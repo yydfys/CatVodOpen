@@ -121,7 +121,7 @@ async function home(filter) {
     async function search(inReq, _outResp) {
     const wd = inReq.body.wd;
         let url = siteUrl + '/index.php?m=vod-search';
-        const html = await request(url, {wd: wd}, true);
+        const html = await request(url, `wd=${wd}`, true);
         const $ = load(html);
         let data = $('#data_list > li');
         let videos = _.map(data, (n) => {
