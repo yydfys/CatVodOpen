@@ -29,6 +29,7 @@ import cntv from './spider/video/cntv.js';
 import cntv2 from './spider/video/cntv2.js';
 import huya from './spider/video/huya.js';
 import douyu from './spider/video/douyu.js';
+import 360ba from './spider/video/360ba.js';
 import bili from './spider/video/bili.js';
 import ktv from './spider/video/ktv.js';
 import live from './spider/video/live.js';
@@ -50,7 +51,7 @@ import vcm3u8 from './spider/video/vcm3u8.js';
 import avm3u8 from './spider/video/avm3u8.js';
 import appys from './spider/video/appys.js';
 import maiyoux from './spider/video/maiyoux.js';
-const spiders = [douban, wogg, ysche, wobg, wwgg, tudou, ddys, nongmin, yunpanres, baipiaoys, anfun, nico, mayiya, kunyu77, libvio, subaibai, ikanbot, czzy, kkys, rrys, nangua, boo, wenku, bg, vcm3u8, appys, fengche, xiaoya, xxpan, cntv, cntv2, sharenice, huya, douyu, bili, ktv, live, bqr, upyun, yiso, yingso, pansearch, push, alist, _13bqg, coco, laobaigs, bookan, baozimh, copymanga, maiyoux, avm3u8];
+const spiders = [douban, wogg, ysche, wobg, wwgg, tudou, ddys, nongmin, yunpanres, baipiaoys, anfun, nico, mayiya, kunyu77, libvio, subaibai, ikanbot, czzy, kkys, rrys, nangua, boo, wenku, bg, vcm3u8, appys, fengche, xiaoya, xxpan, cntv, cntv2, sharenice, huya, douyu, 360ba, bili, ktv, live, bqr, upyun, yiso, yingso, pansearch, push, alist, _13bqg, coco, laobaigs, bookan, baozimh, copymanga, maiyoux, avm3u8];
 const spiderPrefix = '/spider';
 
 /**
