@@ -71,22 +71,11 @@ async function init(inReq, _outResp) {
     } catch (error) {
         
     }
-
-    // cfg.ext.hasOwnProperty("categories") && (extend = cfg.ext.categories)
-    /* 用简单逻辑实现
+    // cfg.ext.hasOwnProperty("categories") && (extend = cfg.ext.categories);
+    /*
     (cookie = (cookie = cfg.ext.hasOwnProperty("cookie") ? cfg.ext.cookie : cookie).startsWith("http") ? await request(cookie) : cookie).split(";").forEach(cookie => {
         cookie.includes("bili_jct") && (bili_jct = cookie.split("=")[1])
     });*/
-
-    if (!cookie) {
-
-        // 如果cookie是http开头
-        cookie = await request(cookie);
-    }
-
-    cookie.split(";").forEach(cookie => {
-        cookie.includes("bili_jct") && (bili_jct = cookie.split("=")[1])
-    });
     
     _.isEmpty(cookie) && await getCookie();
 
@@ -398,40 +387,18 @@ async function play(inReq, _outResp) {
     }
     return null
 }
-
-// key, quick, pg
-async function search(inReq, _outResp) {
-    const key = inReq.body.wd;
-    let pg = inReq.body.page;
-    // const extend = inReq.body.filters;
-
+async function search(key, quick, pg) {
     let page = pg || 1;
     0 == page && (page = 1);
     try {
         var ext = {
                 duration: "0"
-            };
-
-            const prefix = inReq.server.prefix;
-            let resp = await inReq.server.inject().post(`${prefix}/category`).payload({
-                id: key,
-                page: page,
-                filter: true,
-                filters: ext,
-            });
-
-            // var resp = JSON.parse(await category(key, page, !0, ext));
-
-            let v = JSON.parse(resp.body);
-            const catVideos = v.list;
-            const pageCount = v.pagecount;
-
-            // catVideos = resp.list;
-            // pageCount = resp.pagecount;
-            const videos = [];
-        for (let i = 0; i < catVideos.length; ++i) {
-            videos.push(catVideos[i]);
-        } 
+            },
+            resp = JSON.parse(await category(key, page, !0, ext)),
+            catVideos = resp.list,
+            pageCount = resp.pagecount,
+            videos = [];
+        for (let i = 0; i < catVideos.length; ++i) videos.push(catVideos[i]);
         var result = {
             page: page,
             pagecount: pageCount,
@@ -439,13 +406,10 @@ async function search(inReq, _outResp) {
             ratio: 1.33,
             list: videos
         };
-        return result;
-    } catch (e) {
-        console.log(e);
-    }
+        return JSON.stringify(result)
+    } catch (e) {}
     return null
 }
-
 async function proxy(segments, headers) {
     var what = segments[0],
         segments = base64Decode(segments[1]);
@@ -608,12 +572,13 @@ async function test(inReq, outResp) {
                 }
             }
         }
+        /*
         resp = await inReq.server.inject().post(`${prefix}/search`).payload({
-            wd: '隐形的翅膀',
+            wd: '爱',
             page: 1,
         });
         dataResult.search = resp.json();
-        printErr(resp.json());
+        printErr(resp.json());*/
         return dataResult;
     } catch (err) {
         console.error(err);
